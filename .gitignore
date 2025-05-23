@@ -57,3 +57,5 @@ coverage.xml
 
 # Project-specific files
 contacts.*
+*.db
+dummy-*
