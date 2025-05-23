@@ -54,3 +54,6 @@ coverage.xml
 
 # Mac/Linux hidden files
 .DS_Store
+
+# Project-specific files
+contacts.*
