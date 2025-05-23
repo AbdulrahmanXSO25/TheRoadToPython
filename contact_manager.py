@@ -34,7 +34,8 @@ class StorageManager:
         self.filename = filename
         if not os.path.exists(self.filename):
             with open(self.filename, 'wb') as file:
-                pass
+                pickle.dumps([], file)
+            print(f"[✔️] New storage file created at {self.filename}")
         print(f"[✔️] Storage initialized at {self.filename}")
 
     def save(self, data: bytes) -> None:
@@ -222,6 +223,9 @@ class ContactManager:
         self.storage.save(data)
 
     def add_contact(self, name: str, phone: str, email: str) -> None:
+        if contact(name, phone, email) in self.contacts:
+            print(f"[Info] Contact '{name}' already exists.")
+            return
         try:
             contact = Contact(name, phone, email)
             self.contacts += contact
@@ -237,16 +241,15 @@ class ContactManager:
             print(f"[Info] No contact found named '{name}'.")
             return
         contact = matches[0]
-        new_phone = phone.strip() if phone else contact.phone
-        new_email = email.strip() if email else contact.email
         try:
-            updated = Contact(contact.name, new_phone, new_email)
-            self.contacts -= contact
-            self.contacts += updated
-            self.contacts.sort()
+            old_phone, old_email = contact.phone, contact.email
+            contact.phone = Contact._validate_non_empty(phone, "phone") if phone else contact.phone
+            contact.email = Contact._validate_email(email) if email else contact.email
             self._save_contacts()
-            print(f"✏️ Updated: {updated}")
+            print(f"✏️ Updated: {contact}")
         except Exception as e:
+            contact.phone = old_phone
+            contact.email = old_email
             print(f"[Error] {e}")
 
     def delete_contact(self, name: str) -> None:
